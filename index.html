@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Weather App</title>
+</head>
+<body>
+
+    <div class="container">
+
+        <div class="search-box">
+            <input type="text" id="cityInput" placeholder="Search for cities...">
+            <button id="searchBtn">Search</button>
+        </div>
+
+        <div class="weather-card" id="weatherCard">
+
+            <div class="video-section">
+                <video id="bgVideo" autoplay muted loop playsinline>
+                    <source src="videos/Clear.mp4" type="video/mp4">
+                </video>
+
+                <div class="weatherData">
+                    <div class="city-info">
+                        <h1 id="cityName">- - -</h1>
+                        <p id="condition"></p>
+                        <h2 id="temperature">Temperature</h2>
+                    </div>
+                    <img id="weatherIcon" alt="weather icon">
+                </div>
+            </div>
+
+            <div class="details">
+                <div class="detail humid">
+                    <p>Humidity</p>
+                    <h3 id="humidity"></h3>
+                </div>
+                <div class="detail">
+                    <p>Wind</p>
+                    <h3 id="wind"></h3>
+                </div>
+                <div class="detail">
+                    <p>Feels Like</p>
+                    <h3 id="feelsLike"></h3>
+                </div>
+            </div>
+
+        </div>
+
+        <div id="errorMsg"></div>
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
