@@ -1,6 +1,12 @@
 *{
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
+}
+
+html, body{
+    max-width: 100%;
+    overflow-x: hidden;
 }
 
 h1{
@@ -38,55 +44,44 @@ body{
 }
 
 .search-box{
-    width: 100vw;
+    width: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
     margin-bottom: 25px;
+    padding: 0 16px;
+    gap: 0;
 }
+
 
 #cityInput{
     font-weight: 700;
     border: 2px solid rgb(16, 115, 1);
-    width: 30%;
-    height: 30px;
+    width: 100%;
+    max-width: 320px;
+    height: 44px;
     background-color: rgb(202, 216, 231);
     padding: 5px 15px;
     border-radius: 20px 0 0 20px;
+    min-width: 0;
 }
 
 #searchBtn{
     font-weight: 700;
     background-color: green;
-    height: 43px;
-    display: inline;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
     padding: 5px 15px;
     border-radius: 0 20px 20px 0;
 }
 
-.city-info{
-    padding: 50px 40px;
-    width: 200px;
-    height: auto;
-}
 
-.weatherData{
-    position: relative;
-    z-index: 1;
-    display: flex;
-    justify-content: space-between;
-}
-
-#temperature{
-    padding: 10px 20px;
-    margin-top: 40px;
-}
-
-#weatherIcon {
-    width: 200px;
-    object-fit: contain;
-    position: relative;
-    z-index: 1;
+.weather-card{
+    width: 100%;
+    z-index: 2;
 }
 
 /* ===== VIDEO SECTION ===== */
@@ -95,6 +90,21 @@ body{
     overflow: hidden;
     width: 100%;
     min-height: 300px;
+}
+
+.video-section::before{
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+
+    background: linear-gradient(
+        to right,
+        rgba(0,0,0,.75) 0%,
+        rgba(0,0,0,.55) 25%,
+        rgba(0,0,0,.20) 45%,
+        rgba(0,0,0,0) 70%
+    );
 }
 
 #bgVideo {
@@ -107,23 +117,60 @@ body{
     z-index: 0;
 }
 
+.weatherData{
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.city-info{
+    padding: clamp(24px, 6vw, 60px);
+    max-width: 420px;
+    height: auto;
+    text-shadow: 0 2px 8px rgba(0,0,0,.6);
+    min-width: 0;
+}
+
+.city-info h1,
+.city-info p,
+.city-info h2{
+    overflow-wrap: break-word;
+}
+
+#temperature{
+    padding: 10px clamp(0px, 4vw, 20px);
+    margin-top: 40px;
+}
+
+#weatherIcon {
+    object-fit: contain;
+    position: relative;
+    z-index: 1;
+    width: clamp(90px, 22vw, 180px);
+    margin: 10px clamp(10px, 4vw, 40px);
+}
+
 /* ===== DETAILS SECTION ===== */
 .details{
     display: flex;
-    justify-content: space-between;
-    align-items: flex-start;  
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: stretch;
     gap: 20px;
     position: relative;
     z-index: 1;
     background-color: rgb(2, 63, 93);
-    padding: 30px;
+    padding: clamp(16px, 5vw, 30px);
     min-height: 200px;
 }
 
 .detail{
-    flex: 0 0 27%;      
-    max-width: 300px;     
-    aspect-ratio: 1 / 1;       
+    flex: 1 1 140px;
+    max-width: 300px;
+    aspect-ratio: 1 / 1;
     background-color: rgb(14, 129, 149);
     border-radius: 20px;
     display: flex;
@@ -134,6 +181,14 @@ body{
     gap: 10px;
     font-weight: 700;
     transition: 0.3s;
+    padding: 10px;
+    min-width: 0;
+}
+
+.detail h3,
+.detail p{
+    overflow-wrap: break-word;
+    white-space: pre-line;
 }
 
 .detail:hover{
@@ -143,11 +198,12 @@ body{
 
 /* ===== ERROR MSG ===== */
 #errorMsg{
-    width: 70%;
+    width: 90%;
+    max-width: 500px;
     margin: 20px auto 0; 
     text-align: center;
     font-weight: 700;
-    font-size: 25px;
+    font-size: clamp(1.1rem, 4vw, 25px);
     color: rgb(240, 239, 239);
     padding: 10px 0;
     border-radius: 5px;
@@ -175,9 +231,61 @@ body{
     z-index: 1;
 }
 
-/* ===== WEATHER CARD ===== */
-.weather-card{
-    width: 100%;
-    z-index: 2;
+.windy{
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: relative;
+    overflow: hidden;
 }
 
+.windy::before{
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.372);
+}
+
+.windy > *{
+    position: relative;
+    z-index: 1;
+}
+
+/* ============= Feels Like =============*/
+
+.feel{
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: relative;
+    overflow: hidden;
+}
+
+.feel::before{
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.34);
+}
+
+.feel > *{
+    position: relative;
+    z-index: 1;
+}
+
+/* ===== SMALL PHONES ===== */
+@media (max-width: 420px){
+
+    .weatherData{
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    #weatherIcon{
+        margin-left: clamp(24px, 6vw, 60px);
+    }
+
+    .detail{
+        flex: 1 1 100px;
+    }
+}

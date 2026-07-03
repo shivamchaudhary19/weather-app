@@ -13,7 +13,39 @@ const temperature = document.getElementById("temperature");
 const condition = document.getElementById("condition");
 const humidBox = document.querySelector(".humid");
 const bgVideo = document.getElementById("bgVideo");
+const feel = document.querySelector(".feel");
+const windy = document.querySelector(".windy");
 
+// Humidity Function
+function getHumidityCategory(humidity) {
+    if (humidity <= 20) return "Very Dry";
+    if (humidity <= 40) return "Dry";
+    if (humidity <= 60) return "Comfortable";
+    if (humidity <= 80) return "Humid";
+
+    return "Very Humid";
+}
+
+// Wind Function
+function getWindCategory(speed) {
+            if (speed <= 1.5) return "Calm";
+            if (speed <= 3.3) return "Light Breeze";
+            if (speed <= 5.5) return "Moderate Wind";
+            if (speed <= 8.0) return "Strong Wind";
+
+            return "Very Windy";
+        }
+// Feels Like function
+function getFeelsLikeCategory(temp) {
+    if (temp < 0) return "🥶 Freezing";
+    if (temp <= 10) return "🧥 Very Cold";
+    if (temp <= 20) return "🍃 Cool";
+    if (temp <= 28) return "😊 Pleasant";
+    if (temp <= 35) return "☀️ Warm";
+    if (temp <= 42) return "🥵 Hot";
+
+    return "🔥 Extreme Heat";
+}
 
 // Function to fetch weather
 function searchWeather(city = cityInput.value.trim()) {
@@ -41,25 +73,26 @@ function searchWeather(city = cityInput.value.trim()) {
             msg.innerText = "";
             const weather = data.weather[0].main;
             const humidityValue = data.main.humidity;
+            const windSpeed = data.wind.speed;
             condition.innerHTML = `Weather Description: ${weather}`
             cityName.innerText = data.name;
             temperature.innerText = `${Math.round(data.main.temp)}°`;
             humidity.innerText = `${humidityValue}%`;
-            wind.innerText = `${data.wind.speed} km/h`;
-            feelsLike.innerText = `${Math.round(data.main.feels_like)}°`;
 
             // ======== Humidity Section ==============//
+            const humidityCategory = getHumidityCategory(humidityValue);
+            humidity.innerText = `${humidityValue}%\n${humidityCategory}`;
 
-            if (humidityValue <= 20) {
+            if (humidityCategory === "Very Dry") {
                 humidBox.style.backgroundImage = "url('images/very dry.jpg')";
             }
-            else if (humidityValue <= 40) {
+            else if (humidityCategory === "Dry") {
                 humidBox.style.backgroundImage = "url('images/dry.jpg')";
             }
-            else if (humidityValue <= 60) {
+            else if (humidityCategory === "Comfortable") {
                 humidBox.style.backgroundImage = "url('images/comfortable.jpg')";
             }
-            else if (humidityValue <= 80) {
+            else if (humidityCategory === "Humid") {
                 humidBox.style.backgroundImage = "url('images/humid.jpg')";
             }
             else {
@@ -122,10 +155,52 @@ function searchWeather(city = cityInput.value.trim()) {
                 bgVideo.load();
                 bgVideo.play();
             }
+
+// ============ Wind Speed ============//
+       
+        const category = getWindCategory(windSpeed);
+        wind.innerText = `${windSpeed} m/s \n ${category}`;
+
+        if(category === "Calm"){
+            windy.style.backgroundImage = "url('images/calm wind.jpg')";
+        } else if (category === "Light Breeze"){
+            windy.style.backgroundImage = "url('images/breezy wind.jpg')";
+        } else if (category === "Moderate Wind"){
+            windy.style.backgroundImage = "url('images/moderate.jpg')";
+        } else if (category === "Strong Wind"){
+            windy.style.backgroundImage = "url('images/windy.jpg')";
+        } else {
+            windy.style.backgroundImage = "url('images/storm.jpg')";
+        }
+
+// ========= Feels Like ==============//
+        const feelsLikeTemp = Math.round(data.main.feels_like);
+
+        const feelCategory = getFeelsLikeCategory(feelsLikeTemp);
+
+        feelsLike.innerText = `${feelsLikeTemp}°\n${feelCategory}`;
+
+        if(feelCategory === "🥶 Freezing"){
+            feel.style.backgroundImage = "url('images/freezing-feel.jpg')";
+        } else if (feelCategory === "🧥 Very Cold"){
+            feel.style.backgroundImage = "url('images/veryCold-feel.jpg')";
+        } else if (feelCategory === "🍃 Cool"){
+            feel.style.backgroundImage = "url('images/cold-feel.jpg')";
+        } else if (feelCategory === "😊 Pleasant"){
+            feel.style.backgroundImage = "url('images/pleasant-feel.jpg')";
+        } else if(feelCategory === "☀️ Warm"){
+            feel.style.backgroundImage = "url('images/warm-feel.jpg')";
+        } else if(feelCategory === "🥵 Hot"){
+            feel.style.backgroundImage = "url('images/hot-feel.jpg')";
+        } else{
+            feel.style.backgroundImage = "url('images/extremeHeat-feel.jpg')";
+        }
+
         })
         .catch(function() {
             msg.innerText = "Something went wrong!";
         });
+
 }
 
 // Search button
