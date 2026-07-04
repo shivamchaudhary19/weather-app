@@ -166,7 +166,7 @@ function searchWeather(city = cityInput.value.trim()) {
         } else if (category === "Light Breeze"){
             windy.style.backgroundImage = "url('images/breezy wind.jpg')";
         } else if (category === "Moderate Wind"){
-            windy.style.backgroundImage = "url('images/moderate.jpg')";
+            windy.style.backgroundImage = "url('images/moderate.png')";
         } else if (category === "Strong Wind"){
             windy.style.backgroundImage = "url('images/windy.jpg')";
         } else {
