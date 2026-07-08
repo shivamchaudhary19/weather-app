@@ -17,13 +17,22 @@ const feel = document.querySelector(".feel");
 const windy = document.querySelector(".windy");
 const forecastContainer = document.querySelector(".forecast-container");
 
+const dayButtons = document.querySelectorAll(".day");
+const statusButtons = document.querySelectorAll(".status");
+
+// ============ State ================//
+
+let currentDay = null;    
+let currentType = "weather"; 
+let latestForecastData = null; 
+
 // Days Function
 
 const today = new Date();
 
 const days = [];
 
-for(let i = 0; i < 5; i++){
+for (let i = 0; i < 5; i++) {
 
     const date = new Date(today);
 
@@ -32,6 +41,7 @@ for(let i = 0; i < 5; i++){
     days.push(date.toLocaleDateString("en-CA"));
 
 }
+
 
 
 // Humidity Function
@@ -46,13 +56,13 @@ function getHumidityCategory(humidity) {
 
 // Wind Function
 function getWindCategory(speed) {
-            if (speed <= 1.5) return "Calm";
-            if (speed <= 3.3) return "Light Breeze";
-            if (speed <= 5.5) return "Moderate Wind";
-            if (speed <= 8.0) return "Strong Wind";
+    if (speed <= 1.5) return "Calm";
+    if (speed <= 3.3) return "Light Breeze";
+    if (speed <= 5.5) return "Moderate Wind";
+    if (speed <= 8.0) return "Strong Wind";
 
-            return "Very Windy";
-        }
+    return "Very Windy";
+}
 // Feels Like function
 function getFeelsLikeCategory(temp) {
     if (temp < 0) return "🥶 Freezing";
@@ -65,6 +75,168 @@ function getFeelsLikeCategory(temp) {
     return "🔥 Extreme Heat";
 }
 
+// ============ Image helpers  ================//
+function getHumidityImage(category) {
+    switch (category) {
+        case "Very Dry": 
+        return "images/very dry.jpg";
+
+        case "Dry": 
+        return "images/dry.jpg";
+
+        case "Comfortable": 
+        return "images/comfortable.jpg";
+
+        case "Humid": 
+        return "images/humid.jpg";
+
+        default: 
+        return "images/very humid.jpg";
+    }
+}
+
+function getWindImage(category) {
+    switch (category) {
+        case "Calm": 
+        return "images/calm wind.jpg";
+
+        case "Light Breeze": 
+        return "images/breezy wind.jpg";
+
+        case "Moderate Wind": 
+        return "images/moderate.png";
+
+        case "Strong Wind": 
+        return "images/windy.jpg";
+
+        default: 
+        return "images/storm.jpg";
+    }
+}
+
+function getFeelsLikeImage(category) {
+    switch (category) {
+        case "🥶 Freezing": 
+        return "images/freezing-feel.jpg";
+
+        case "🧥 Very Cold": 
+        return "images/veryCold-feel.jpg";
+
+        case "🍃 Cool": 
+        return "images/cold-feel.jpg";
+
+        case "😊 Pleasant": 
+        return "images/pleasant-feel.jpg";
+
+        case "☀️ Warm": 
+        return "images/warm-feel.jpg";
+
+        case "🥵 Hot": 
+        return "images/hot-feel.jpg";
+
+        default: 
+        return "images/extremeHeat-feel.jpg";
+    }
+}
+
+function getWeatherVideo(weather) {
+    switch (weather) {
+        case "Clear": 
+        return "videos/Clear.mp4";
+
+        case "Clouds": 
+        return "videos/Cloudy.mp4";
+
+        case "Rain":
+        case "Drizzle": 
+        return "videos/Rainy.mp4";
+
+        case "Thunderstorm": 
+        return "videos/Thunderstorm.mp4";
+
+        case "Snow": 
+        return "videos/Foggy.mp4";
+
+        case "Mist":
+        case "Fog": 
+        return "videos/Foggy.mp4";
+
+        case "Haze": 
+        return "videos/Mist.mp4";
+
+        default: 
+        return "videos/Clear.mp4";
+    }
+}
+
+// ============ Single shared forecast renderer ================//
+
+function showForecast(selectedDay, selectedType) {
+
+    if (!latestForecastData || !selectedDay) return;
+
+    forecastContainer.innerHTML = "";
+
+    for (let i = 0; i < latestForecastData.list.length; i++) {
+
+        const item = latestForecastData.list[i];
+
+        if (item.dt_txt.split(" ")[0] !== selectedDay) continue;
+
+        const date = new Date(item.dt_txt);
+        const formattedDate = date.toLocaleDateString("en-US", {
+            month: "long",
+            day: "numeric"
+        });
+        const time = item.dt_txt.split(" ")[1];
+
+        let bgImage = "";
+        let mainValue = "";
+        let categoryLabel = "";
+
+        if (selectedType === "weather") {
+            const weatherMain = item.weather[0].main;
+            bgImage = `images/${weatherMain}.jpg`;
+            mainValue = `${Math.round(item.main.temp)} °C`;
+            categoryLabel = weatherMain;
+
+        } else if (selectedType === "humidity") {
+            const humidityValue = item.main.humidity;
+            const category = getHumidityCategory(humidityValue);
+            bgImage = getHumidityImage(category);
+            mainValue = `${humidityValue}%`;
+            categoryLabel = category;
+
+        } else if (selectedType === "wind") {
+            const windSpeed = item.wind.speed;
+            const category = getWindCategory(windSpeed);
+            bgImage = getWindImage(category);
+            mainValue = `${windSpeed.toFixed(2)} m/s`;
+            categoryLabel = category;
+
+        } else if (selectedType === "feelsLike") {
+            const feelsLikeTemp = Math.round(item.main.feels_like);
+            const category = getFeelsLikeCategory(feelsLikeTemp);
+            bgImage = getFeelsLikeImage(category);
+            mainValue = `${feelsLikeTemp}°`;
+            categoryLabel = category;
+        }
+
+        const card = document.createElement("div");
+        card.className = "forecast-card";
+        card.style.backgroundImage = `url(${bgImage})`;
+        card.innerHTML = `<div class="forecast-content">
+                <h3>${formattedDate}</h3>
+                <h4>${mainValue}</h4>
+                <p>Time : ${time}</p>
+                <p>${categoryLabel}</p>
+            </div>
+            `;
+
+        forecastContainer.appendChild(card);
+    }
+}
+
 // Function to fetch weather
 function searchWeather(city = cityInput.value.trim()) {
 
@@ -74,21 +246,21 @@ function searchWeather(city = cityInput.value.trim()) {
     }
 
     msg.innerText = "";
-    //================================
-const currentUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric`;
-const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${API_KEY}&units=metric`;
 
-Promise.all([
-    fetch(currentUrl).then(r => r.json()),
-    fetch(forecastUrl).then(r => r.json())
-])
-.then(function([currentData, forecastData]) {
-     // Invalid city
+    const currentUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric`;
+    const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${API_KEY}&units=metric`;
+
+    Promise.all([
+        fetch(currentUrl).then(r => r.json()),
+        fetch(forecastUrl).then(r => r.json())
+    ])
+        .then(function ([currentData, forecastData]) {
+            // Invalid city
             if (currentData.cod !== 200) {
                 msg.innerText = "City not found.";
                 return;
             }
-            document.getElementById("weatherIcon").src =`https://openweathermap.org/img/wn/${currentData.weather[0].icon}@4x.png`;
+            document.getElementById("weatherIcon").src = `https://openweathermap.org/img/wn/${currentData.weather[0].icon}@4x.png`;
             msg.innerText = "";
             const weather = currentData.weather[0].main;
             const humidityValue = currentData.main.humidity;
@@ -98,177 +270,96 @@ Promise.all([
             temperature.innerText = `${Math.round(currentData.main.temp)}°`;
 
             // ======== Humidity Section ==============//
+
             const humidityCategory = getHumidityCategory(humidityValue);
             humidity.innerText = `${humidityValue}%\n${humidityCategory}`;
+            humidBox.style.backgroundImage = `url('${getHumidityImage(humidityCategory)}')`;
 
-            if (humidityCategory === "Very Dry") {
-                humidBox.style.backgroundImage = "url('images/very dry.jpg')";
-            }
-            else if (humidityCategory === "Dry") {
-                humidBox.style.backgroundImage = "url('images/dry.jpg')";
-            }
-            else if (humidityCategory === "Comfortable") {
-                humidBox.style.backgroundImage = "url('images/comfortable.jpg')";
-            }
-            else if (humidityCategory === "Humid") {
-                humidBox.style.backgroundImage = "url('images/humid.jpg')";
-            }
-            else {
-                humidBox.style.backgroundImage = "url('images/very humid.jpg')";
-            }
+            // ============== Weather video =============//
 
-// ============== Weather =============//
-            switch(weather){
-
-            case "Clear":
-                bgVideo.src = "videos/Clear.mp4";
-                break;
-
-            case "Clouds":
-                bgVideo.src = "videos/Cloudy.mp4";
-                break;
-
-            case "Rain":
-            bgVideo.src = "videos/Rainy.mp4";
-                break;
-
-            case "Drizzle":
-                bgVideo.src = "videos/Rainy.mp4";
-                break;
-
-            case "Thunderstorm":
-                bgVideo.src = "videos/Thunderstorm.mp4";
-                break;
-
-            case "Snow":
-                bgVideo.src = "videos/Foggy.mp4";
-                break;
-
-            case "Mist":
-            case "Fog":
-                bgVideo.src = "videos/Foggy.mp4";
-                break;
-            case "Haze":
-                bgVideo.src = "videos/Mist.mp4";
-                
-                break;
-
-            default:
-                bgVideo.src = "videos/Clear.mp4";
-            }
+            bgVideo.src = getWeatherVideo(weather);
             bgVideo.load();
             bgVideo.play();
 
-// ============ Wind Speed ============//
-       
-        const category = getWindCategory(windSpeed);
-        wind.innerText = `${windSpeed.toFixed(2)} m/s \n ${category}`;
+            // ============ Wind Speed ============//
 
-        if(category === "Calm"){
-            windy.style.backgroundImage = "url('images/calm wind.jpg')";
-        } else if (category === "Light Breeze"){
-            windy.style.backgroundImage = "url('images/breezy wind.jpg')";
-        } else if (category === "Moderate Wind"){
-            windy.style.backgroundImage = "url('images/moderate.png')";
-        } else if (category === "Strong Wind"){
-            windy.style.backgroundImage = "url('images/windy.jpg')";
-        } else {
-            windy.style.backgroundImage = "url('images/storm.jpg')";
-        }
+            const category = getWindCategory(windSpeed);
+            wind.innerText = `${windSpeed.toFixed(2)} m/s \n ${category}`;
+            windy.style.backgroundImage = `url('${getWindImage(category)}')`;
 
-// ========= Feels Like ==============//
-        const feelsLikeTemp = Math.round(currentData.main.feels_like);
+            // ========= Feels Like ==============//
 
-        const feelCategory = getFeelsLikeCategory(feelsLikeTemp);
+            const feelsLikeTemp = Math.round(currentData.main.feels_like);
+            const feelCategory = getFeelsLikeCategory(feelsLikeTemp);
+            feelsLike.innerText = `${feelsLikeTemp}°\n${feelCategory}`;
+            feel.style.backgroundImage = `url('${getFeelsLikeImage(feelCategory)}')`;
 
-        feelsLike.innerText = `${feelsLikeTemp}°\n${feelCategory}`;
+            // ============ Store forecast data & render ================//
 
-        if(feelCategory === "🥶 Freezing"){
-            feel.style.backgroundImage = "url('images/freezing-feel.jpg')";
-        } else if (feelCategory === "🧥 Very Cold"){
-            feel.style.backgroundImage = "url('images/veryCold-feel.jpg')";
-        } else if (feelCategory === "🍃 Cool"){
-            feel.style.backgroundImage = "url('images/cold-feel.jpg')";
-        } else if (feelCategory === "😊 Pleasant"){
-            feel.style.backgroundImage = "url('images/pleasant-feel.jpg')";
-        } else if(feelCategory === "☀️ Warm"){
-            feel.style.backgroundImage = "url('images/warm-feel.jpg')";
-        } else if(feelCategory === "🥵 Hot"){
-            feel.style.backgroundImage = "url('images/hot-feel.jpg')";
-        } else{
-            feel.style.backgroundImage = "url('images/extremeHeat-feel.jpg')";
-        }
+            latestForecastData = forecastData;
 
-    // new forecast logic using forecastData
-
-    function showForecast(day){
-
-        // Remove previous cards
-        forecastContainer.innerHTML = "";
-
-        // Loop through all forecast data
-        for(let i = 0; i < forecastData.list.length; i++){
-
-            if(forecastData.list[i].dt_txt.split(" ")[0] === day){
-
-                const card = document.createElement("div");
-                const date = new Date(forecastData.list[i].dt_txt);
-                const formattedDate = date.toLocaleDateString("en-US", {
-                    month: "long",
-                    day: "numeric"
-                });
-
-                
-                card.className = "forecast-card";
-                card.style.backgroundImage = `url(images/${forecastData.list[i].weather[0].main}.jpg)`
-                card.innerHTML = `<div class="forecast-content">
-                        <h3>${formattedDate}</h3>
-                        <h4>${forecastData.list[i].main.temp} °C</h4>
-                        <p>Time : ${forecastData.list[i].dt_txt.split(" ")[1]}</p>
-                        <p>${forecastData.list[i].weather[0].main}</p>
-                    </div>
-                    `
-                
-                forecastContainer.appendChild(card);
+            if (currentDay === null) {
+                currentDay = days[0];
             }
 
-        }
+            showForecast(currentDay, currentType);
 
-    }
-
-    document.getElementById("Today").addEventListener("click", () => {
-        showForecast(days[0]);
-    });
-
-    document.getElementById("Second").addEventListener("click", () => {
-        showForecast(days[1]);
-    });
-
-    document.getElementById("Third").addEventListener("click", () => {
-        showForecast(days[2]);
-    });
-
-    document.getElementById("Fourth").addEventListener("click", () => {
-        showForecast(days[3]);
-    });
-
-    document.getElementById("Fifth").addEventListener("click", () => {
-        showForecast(days[4]);
-    });
-
-    showForecast(days[0])
-    })
-.catch(function() {
-    msg.innerText = "Something went wrong!";
-});
+        })
+        .catch(function () {
+            msg.innerText = "Something went wrong!";
+        });
 
 }
+
+// ============ Day buttons ================//
+
+dayButtons.forEach((button, index) => {
+
+    button.addEventListener("click", () => {
+
+        dayButtons.forEach(btn => btn.classList.remove("active"));
+        button.classList.add("active");
+
+        currentDay = days[index];
+
+        showForecast(currentDay, currentType);
+    });
+
+});
+
+// ============ Status buttons: Weather / Humidity / Wind / Feels Like ================//
+statusButtons.forEach((button) => {
+
+    button.addEventListener("click", () => {
+
+        statusButtons.forEach(btn => btn.classList.remove("active"));
+        button.classList.add("active");
+
+        if (button.classList.contains("look")) {
+            currentType = "weather";
+        } else if (button.classList.contains("humidityStatus")) {
+            currentType = "humidity";
+        } else if (button.classList.contains("windStatus")) {
+            currentType = "wind";
+        } else if (button.classList.contains("feelsLikeStatus")) {
+            currentType = "feelsLike";
+        }
+
+        showForecast(currentDay, currentType);
+    });
+
+});
+
+// Set default active buttons: Today + Weather ("look")
+
+dayButtons[0].classList.add("active");
+document.querySelector(".look.status").classList.add("active");
 
 // Search button
 searchBtn.addEventListener("click", searchWeather);
 
 // Enter key
-cityInput.addEventListener("keydown", function(event) {
+cityInput.addEventListener("keydown", function (event) {
     if (event.key === "Enter") {
         searchWeather();
     }
@@ -276,17 +367,3 @@ cityInput.addEventListener("keydown", function(event) {
 
 // Default weather when page opens
 searchWeather("Khalilabad");
-
-const buttons = document.querySelectorAll(".day");
-
-buttons.forEach(button => {
-
-    button.addEventListener("click", () => {
-
-        buttons.forEach(btn => btn.classList.remove("active"));
-
-        button.classList.add("active");
-
-    });
-
-});
