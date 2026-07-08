@@ -361,7 +361,7 @@ body{
     flex-direction: column;
     justify-content: center;
     align-items: center;
-
+    border: 1px solid white;
     flex-shrink: 0;
 
     text-align: center;
