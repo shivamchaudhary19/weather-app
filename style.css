@@ -323,3 +323,117 @@ body{
         height: 250px;
     }
 }
+
+
+.forecast-container{
+    display: flex;
+    gap: 15px;
+
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    padding: 20px;
+    background-color: rgb(2, 63, 93);
+
+    min-height: 220px;
+    width: 100%;
+}
+
+.forecast-container::-webkit-scrollbar{
+    display: none;
+}
+
+.forecast-container{
+    scrollbar-width: none;
+}
+
+.forecast-card{
+    line-height: 1.5;
+    min-width: 170px;
+    height: 180px;
+
+    background: rgb(14, 129, 149);
+    color: white;
+
+    border-radius: 10px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    flex-shrink: 0;
+
+    text-align: center;
+    font-weight: bold;
+
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    overflow: hidden;
+
+    position: relative;
+    transition: 0.3s;
+}
+
+.forecast-card:hover{
+    transform: scale(1.03);
+    box-shadow: inset 0 0 10px white;
+}
+
+.forecast-card::before{
+    content: "";
+
+    position: absolute;
+    inset: 0;
+
+    background: rgba(0, 0, 0, 0.35);
+}
+
+.forecast-content{
+    position: relative;
+    z-index: 2;
+}
+
+/*========= Day Selector Buttons =============*/
+
+.buttons{
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    align-items: center;
+    margin: 20px 0;
+    flex-wrap: wrap;
+}
+
+.day{
+    padding: 10px 22px;
+
+    background: rgb(14,129,149);
+    color: white;
+
+    border: none;
+    border-radius: 30px;
+
+    font-size: 16px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: all .25s ease;
+}
+
+.day:hover{
+    background: rgb(18,155,180);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 18px rgba(0,0,0,.35);
+}
+
+.day:active{
+    transform: scale(.96);
+}
+
+.day:active{
+    background: rgb(255,140,0);
+    box-shadow: 0 0 15px rgba(255,140,0,.6);
+}

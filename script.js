@@ -15,6 +15,24 @@ const humidBox = document.querySelector(".humid");
 const bgVideo = document.getElementById("bgVideo");
 const feel = document.querySelector(".feel");
 const windy = document.querySelector(".windy");
+const forecastContainer = document.querySelector(".forecast-container");
+
+// Days Function
+
+const today = new Date();
+
+const days = [];
+
+for(let i = 0; i < 5; i++){
+
+    const date = new Date(today);
+
+    date.setDate(today.getDate() + i);
+
+    days.push(date.toLocaleDateString("en-CA"));
+
+}
+
 
 // Humidity Function
 function getHumidityCategory(humidity) {
@@ -56,28 +74,28 @@ function searchWeather(city = cityInput.value.trim()) {
     }
 
     msg.innerText = "";
+    //================================
+const currentUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric`;
+const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${API_KEY}&units=metric`;
 
-    const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric`;
-
-    fetch(url)
-        .then(function(response) {
-            return response.json();
-        })
-        .then(function(data) {
-            // Invalid city
-            if (data.cod !== 200) {
+Promise.all([
+    fetch(currentUrl).then(r => r.json()),
+    fetch(forecastUrl).then(r => r.json())
+])
+.then(function([currentData, forecastData]) {
+     // Invalid city
+            if (currentData.cod !== 200) {
                 msg.innerText = "City not found.";
                 return;
             }
-            document.getElementById("weatherIcon").src = `https://openweathermap.org/img/wn/${data.weather[0].icon}@4x.png`;
+            document.getElementById("weatherIcon").src =`https://openweathermap.org/img/wn/${currentData.weather[0].icon}@4x.png`;
             msg.innerText = "";
-            const weather = data.weather[0].main;
-            const humidityValue = data.main.humidity;
-            const windSpeed = data.wind.speed;
+            const weather = currentData.weather[0].main;
+            const humidityValue = currentData.main.humidity;
+            const windSpeed = currentData.wind.speed;
             condition.innerHTML = `${weather}`
-            cityName.innerText = data.name;
-            temperature.innerText = `${Math.round(data.main.temp)}°`;
-            humidity.innerText = `${humidityValue}%`;
+            cityName.innerText = currentData.name;
+            temperature.innerText = `${Math.round(currentData.main.temp)}°`;
 
             // ======== Humidity Section ==============//
             const humidityCategory = getHumidityCategory(humidityValue);
@@ -104,62 +122,47 @@ function searchWeather(city = cityInput.value.trim()) {
 
             case "Clear":
                 bgVideo.src = "videos/Clear.mp4";
-                bgVideo.load();
-                bgVideo.play();
                 break;
 
             case "Clouds":
                 bgVideo.src = "videos/Cloudy.mp4";
-                bgVideo.load();
-                bgVideo.play();
                 break;
 
             case "Rain":
             bgVideo.src = "videos/Rainy.mp4";
-                bgVideo.load();
-                bgVideo.play();
                 break;
 
             case "Drizzle":
                 bgVideo.src = "videos/Rainy.mp4";
-                bgVideo.load();
-                bgVideo.play();
                 break;
 
             case "Thunderstorm":
                 bgVideo.src = "videos/Thunderstorm.mp4";
-                bgVideo.load();
-                bgVideo.play();
                 break;
 
             case "Snow":
                 bgVideo.src = "videos/Foggy.mp4";
-                bgVideo.load();
-                bgVideo.play();
                 break;
 
             case "Mist":
             case "Fog":
                 bgVideo.src = "videos/Foggy.mp4";
-                bgVideo.load();
-                bgVideo.play();
                 break;
             case "Haze":
                 bgVideo.src = "videos/Mist.mp4";
-                bgVideo.load();
-                bgVideo.play();
+                
                 break;
 
             default:
                 bgVideo.src = "videos/Clear.mp4";
-                bgVideo.load();
-                bgVideo.play();
             }
+            bgVideo.load();
+            bgVideo.play();
 
 // ============ Wind Speed ============//
        
         const category = getWindCategory(windSpeed);
-        wind.innerText = `${windSpeed} m/s \n ${category}`;
+        wind.innerText = `${windSpeed.toFixed(2)} m/s \n ${category}`;
 
         if(category === "Calm"){
             windy.style.backgroundImage = "url('images/calm wind.jpg')";
@@ -174,7 +177,7 @@ function searchWeather(city = cityInput.value.trim()) {
         }
 
 // ========= Feels Like ==============//
-        const feelsLikeTemp = Math.round(data.main.feels_like);
+        const feelsLikeTemp = Math.round(currentData.main.feels_like);
 
         const feelCategory = getFeelsLikeCategory(feelsLikeTemp);
 
@@ -196,10 +199,68 @@ function searchWeather(city = cityInput.value.trim()) {
             feel.style.backgroundImage = "url('images/extremeHeat-feel.jpg')";
         }
 
-        })
-        .catch(function() {
-            msg.innerText = "Something went wrong!";
-        });
+    // new forecast logic using forecastData
+
+    function showForecast(day){
+
+        // Remove previous cards
+        forecastContainer.innerHTML = "";
+
+        // Loop through all forecast data
+        for(let i = 0; i < forecastData.list.length; i++){
+
+            if(forecastData.list[i].dt_txt.split(" ")[0] === day){
+
+                const card = document.createElement("div");
+                const date = new Date(forecastData.list[i].dt_txt);
+                const formattedDate = date.toLocaleDateString("en-US", {
+                    month: "long",
+                    day: "numeric"
+                });
+
+                
+                card.className = "forecast-card";
+                card.style.backgroundImage = `url(images/${forecastData.list[i].weather[0].main}.jpg)`
+                card.innerHTML = `<div class="forecast-content">
+                        <h3>${formattedDate}</h3>
+                        <h4>${forecastData.list[i].main.temp} °C</h4>
+                        <p>Time : ${forecastData.list[i].dt_txt.split(" ")[1]}</p>
+                        <p>${forecastData.list[i].weather[0].main}</p>
+                    </div>
+                    `
+                
+                forecastContainer.appendChild(card);
+            }
+
+        }
+
+    }
+
+    document.getElementById("Today").addEventListener("click", () => {
+        showForecast(days[0]);
+    });
+
+    document.getElementById("Second").addEventListener("click", () => {
+        showForecast(days[1]);
+    });
+
+    document.getElementById("Third").addEventListener("click", () => {
+        showForecast(days[2]);
+    });
+
+    document.getElementById("Fourth").addEventListener("click", () => {
+        showForecast(days[3]);
+    });
+
+    document.getElementById("Fifth").addEventListener("click", () => {
+        showForecast(days[4]);
+    });
+
+    showForecast(days[0])
+    })
+.catch(function() {
+    msg.innerText = "Something went wrong!";
+});
 
 }
 
@@ -215,3 +276,17 @@ cityInput.addEventListener("keydown", function(event) {
 
 // Default weather when page opens
 searchWeather("Khalilabad");
+
+const buttons = document.querySelectorAll(".day");
+
+buttons.forEach(button => {
+
+    button.addEventListener("click", () => {
+
+        buttons.forEach(btn => btn.classList.remove("active"));
+
+        button.classList.add("active");
+
+    });
+
+});
