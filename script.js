@@ -91,17 +91,17 @@ function getHumidityImage(category) {
         return "images/humid.jpg";
 
         default: 
-        return "images/very humid.jpg";
+        return "images/very-humid.jpg";
     }
 }
 
 function getWindImage(category) {
     switch (category) {
         case "Calm": 
-        return "images/calm wind.jpg";
+        return "images/calm-wind.jpg";
 
         case "Light Breeze": 
-        return "images/breezy wind.jpg";
+        return "images/breezy-wind.jpg";
 
         case "Moderate Wind": 
         return "images/moderate.png";

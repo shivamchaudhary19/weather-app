@@ -9,8 +9,19 @@ html, body{
     overflow-x: hidden;
 }
 
+hr{
+    border: none;
+    height: 1px;
+    width: 100%;
 
-
+    background: linear-gradient(
+        to right,
+        transparent 0%,
+        white 20%,
+        white 80%,
+        transparent 100%
+    );
+}
 /* ===== Layout Fix ===== */
 .container{
     width: min(1100px, 95%);
@@ -199,11 +210,12 @@ body{
 
 .detail{
     flex: 1 1 140px;
-    max-width: 300px;
+    max-width: 200px;
     aspect-ratio: 1 / 1;
     background-color: rgb(14, 129, 149);
-    border-radius: 20px;
+    border-radius: 10px;
     display: flex;
+    border: 1px solid rgba(255, 255, 255, 0.418);
     flex-direction: column;
     justify-content: center;
     align-items: center;
@@ -329,14 +341,25 @@ body{
     display: flex;
     gap: 15px;
 
+    justify-content: flex-start;
+
     overflow-x: auto;
     overflow-y: hidden;
 
     padding: 20px;
-    background-color: rgb(2, 63, 93);
+    box-sizing: border-box;
 
-    min-height: 220px;
     width: 100%;
+    min-height: 220px;
+
+    background: rgb(2,63,93);
+}
+.forecast-card:first-child{
+    margin-left: 10px;
+}
+
+.forecast-card:last-child{
+    margin-right: 10px;
 }
 
 .forecast-container::-webkit-scrollbar{
@@ -356,12 +379,11 @@ body{
     color: white;
 
     border-radius: 10px;
-
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    border: 1px solid white;
+    border: 1px solid rgba(255, 255, 255, 0.705);
     flex-shrink: 0;
 
     text-align: center;
@@ -413,9 +435,9 @@ body{
     color: white;
 
     border: none;
-    border-radius: 30px;
+    border-radius: 5px;
 
-    font-size: 16px;
+    font-size: clamp(0.7rem , 10px , 1.5rem);
     font-weight: 600;
 
     cursor: pointer;
@@ -455,9 +477,9 @@ body{
     color: white;
 
     border: none;
-    border-radius: 30px;
+    border-radius: 5px;
 
-    font-size: 16px;
+    font-size: clamp(0.7rem , 10px , 1.5rem);
     font-weight: 600;
 
     cursor: pointer;
@@ -477,3 +499,13 @@ body{
     box-shadow: 0 0 15px rgb(17, 83, 248);
 }
 
+.weatherCardType{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.weatherCardType h3{
+    margin-top: 10px;
+}
