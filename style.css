@@ -451,13 +451,18 @@ body{
     box-shadow: 0 8px 18px rgba(0,0,0,.35);
 }
 
-.day:active{
-    transform: scale(.96);
+.day{
+    --active-color: rgb(255,140,0);
 }
 
-.day.active{
-    background: rgb(255,140,0);
-    box-shadow: 0 0 15px rgba(255,140,0,.6);
+.day.active,
+.day:active{
+    background: var(--active-color);
+    box-shadow: 0 0 15px var(--active-color);
+}
+
+.day:active{
+    transform: scale(.96);
 }
 
 
@@ -493,12 +498,19 @@ body{
     box-shadow: 0 8px 18px rgba(0,0,0,.35);
 }
 
-.status:active{
-    transform: scale(.96);
-    background: rgb(17, 83, 248);
-    box-shadow: 0 0 15px rgb(17, 83, 248);
+.status{
+    --active-color: rgb(17,83,248);
 }
 
+.status.active,
+.status:active{
+    background: var(--active-color);
+    box-shadow: 0 0 15px var(--active-color);
+}
+
+.status:active{
+    transform: scale(.96);
+}
 .weatherCardType{
     display: flex;
     flex-direction: column;
@@ -509,3 +521,4 @@ body{
 .weatherCardType h3{
     margin-top: 10px;
 }
+
